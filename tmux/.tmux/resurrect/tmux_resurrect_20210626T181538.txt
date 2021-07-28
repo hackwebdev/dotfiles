@@ -1,0 +1,7 @@
+pane	0	0	:nvim	1	:*	0	:/home/eckzen/Sandbox/svelte-beginner	1	nvim	:nvim .
+pane	0	0	:nvim	1	:*	1	:/home/eckzen/Sandbox/svelte-beginner	0	npm	:npm run dev
+pane	0	0	:nvim	1	:*	2	:/home/eckzen/Sandbox/svelte-beginner	0	bash	:
+pane	1	0	:nvim	1	:*	0	:/home/eckzen/.config/nvim	1	nvim	:nvim .
+window	0	0	1	:*	7bc7,114x54,0,0[114x42,0,0,0,114x11,0,43{57x11,0,43,1,56x11,58,43,2}]
+window	1	0	1	:*	cae0,233x57,0,0,3
+state	0	
