@@ -1,8 +1,0 @@
-pane	0	0	:nvim	1	:*	0	:/home/eckzen/Sandbox/svelte	0	nvim	:nvim .
-pane	0	0	:nvim	1	:*	1	:/home/eckzen/Sandbox/svelte	0	bash	:
-pane	0	0	:nvim	1	:*	2	:/home/eckzen/Sandbox/svelte	1	bash	:
-pane	0	0	:nvim	1	:*	3	:/home/eckzen	0	mongod	:mongod --auth --port 27017 -dbpath /home/eckzen/database
-pane	1	0	:bash	1	:*	0	:/home/eckzen	1	bash	:
-window	0	0	1	:*	e004,158x70,0,0[158x45,0,0,0,158x24,0,46{82x24,0,46,2,75x24,83,46[75x15,83,46,3,75x8,83,62,4]}]
-window	1	0	1	:*	c6be,152x75,0,0,1
-state	0	1

@@ -1,9 +1,0 @@
-pane	0	0	:nvim	1	:*	0	:/home/eckzen/Sandbox/svelte	1	nvim	:nvim .
-pane	0	0	:nvim	1	:*	1	:/home/eckzen/Sandbox/svelte	0	bash	:
-pane	0	0	:nvim	1	:*	2	:/home/eckzen/Sandbox/svelte	0	npm	:npm run dev
-pane	1	0	:nvim	1	:*	0	:/home/eckzen/.config/nvim	1	nvim	:nvim .
-pane	2	0	:nvim	1	:*	0	:/home/eckzen/.config/nvim	1	nvim	:nvim .
-window	0	0	1	:*	fa8d,116x57,0,0[116x40,0,0,1,116x16,0,41{58x16,0,41,2,57x16,59,41,3}]
-window	1	0	1	:*	cac1,114x57,0,0,4
-window	2	0	1	:*	bee2,233x54,0,0,5
-state	0	1

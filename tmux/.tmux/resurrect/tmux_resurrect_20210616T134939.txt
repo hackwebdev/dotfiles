@@ -1,5 +1,0 @@
-pane	0	0	:nvim	1	:*	0	:/home/eckzen/Sandbox/061621-sveltekit-tailwindcss	1	nvim	:nvim .
-pane	0	0	:nvim	1	:*	1	:/home/eckzen/Sandbox/061621-sveltekit-tailwindcss	0	npm	:npm run dev --open
-pane	0	0	:nvim	1	:*	2	:/home/eckzen/Sandbox/061621-sveltekit-tailwindcss	0	bash	:
-window	0	0	1	:*	cf3b,112x53,0,0[112x41,0,0,0,112x5,0,42,1,112x5,0,48,4]
-state	0	
