@@ -8,7 +8,7 @@ local g = vim.g -- a table to access global variables
 local opt = vim.opt -- to set options
 
 local function map(mode, lhs, rhs, opts)
-  local options = {noremap = true}
+  local options = { noremap = true }
   if opts then
     options = vim.tbl_extend("force", options, opts)
   end
@@ -18,40 +18,64 @@ end
 -- Map leader to space
 g.mapleader = " "
 
+-- Give me some fenced codeblock goodness
+g.markdown_fenced_languages = { "html", "javascript", "typescript", "css", "scss", "lua", "vim", "svelte" }
+
+-- Lightspeed remap
+vim.api.nvim_set_keymap("n", "h", "<Plug>Lightspeed_s", {})
+vim.api.nvim_set_keymap("n", "H", "<Plug>Lightspeed_S", {})
+vim.api.nvim_set_keymap("v", "h", "<Plug>Lightspeed_s", {})
+vim.api.nvim_set_keymap("v", "H", "<Plug>Lightspeed_S", {})
+
 -- Plugins
-require "paq" {
-  "airblade/vim-gitgutter",
+require("paq-nvim")({
   "alvan/vim-closetag",
-  "terrortylor/nvim-comment",
+  "b3nj5m1n/kommentary",
+  "ggandor/lightspeed.nvim",
   "glepnir/lspsaga.nvim",
   "hoob3rt/lualine.nvim",
   "hrsh7th/nvim-compe",
   "hrsh7th/vim-vsnip",
   "jiangmiao/auto-pairs",
   "kyazdani42/nvim-web-devicons",
+  "lewis6991/gitsigns.nvim",
   "mhartington/formatter.nvim",
   "neovim/nvim-lspconfig",
-  "nvim-lua/lsp-status.nvim",
   "nvim-lua/plenary.nvim",
   "nvim-lua/popup.nvim",
   "nvim-telescope/telescope.nvim",
   "nvim-treesitter/nvim-treesitter",
-  "phaazon/hop.nvim",
+  "onsails/lspkind-nvim",
   "rmagatti/auto-session",
   "sainnhe/everforest",
   "savq/paq-nvim",
   "tpope/vim-repeat",
-  "tpope/vim-surround",
   "wellle/targets.vim",
+  "wfxr/minimap.vim",
+  "winston0410/cmd-parser.nvim",
+  "winston0410/range-highlight.nvim",
+  "blackCauldron7/surround.nvim",
   "kabouzeid/nvim-lspinstall",
   "kyazdani42/nvim-tree.lua",
   "romgrk/barbar.nvim",
-  "wfxr/minimap.vim",
   "terryma/vim-multiple-cursors",
   "folke/which-key.nvim"
-}
+})
 
-require('nvim_comment').setup()
+
+
+-- Range highlight
+require("range-highlight").setup({})
+require("surround").setup({})
+
+-- lspkind Icon setup
+require("lspkind").init({})
+-- gitsigns setup
+require("gitsigns").setup({
+  numhl = true,
+  signcolumn = false,
+})
+
 local wk = require("which-key")
 
 wk.register({
@@ -76,11 +100,11 @@ wk.register({
         ["r"] = "rename",
         ["d"] = "preview",
     },
-    h = {
-        name = "hop",
-        ["l"] = "words",
-        ["j"] = "lines"
-    },
+    -- h = {
+    --     name = "hop",
+    --     ["l"] = "words",
+    --     ["j"] = "lines"
+    -- },
     s = {
         name = "search",
         ["b"] = "buffers",
@@ -99,8 +123,10 @@ wk.register({
 map("n","<leader>e","<cmd>NvimTreeToggle<CR>") 
 map("n","<C-r>","<cmd>NvimTreeRefresh<CR>")
   -- CommentToggle
-map("n","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
-map("v","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
+-- map("n","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
+-- map("v","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
+map("n","<leader>/","<Plug>kommentary_line_default",{})
+-- map("n","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
   -- better indenting
 map("v","<","<gv")
 map("v",">",">gv")
@@ -110,13 +136,15 @@ map("x","J",":move '>+1<CR>gv-gv")
   -- minimap
 map("n","<leader>m","<cmd>MinimapToggle<CR>")
 
-
 -- Hop
-require "hop".setup()
-map("n", "<leader>hj", "<cmd>lua require'hop'.hint_words()<cr>")
-map("n", "<leader>hl", "<cmd>lua require'hop'.hint_lines()<cr>")
-map("v", "<leader>hj", "<cmd>lua require'hop'.hint_words()<cr>")
-map("v", "<leader>hl", "<cmd>lua require'hop'.hint_lines()<cr>")
+--[[ require("hop").setup({
+	reverse_distribution = true,
+})
+map("n", "<leader>h", "<cmd>lua require'hop'.hint_words()<cr>")
+map("n", "<leader>l", "<cmd>lua require'hop'.hint_lines()<cr>")
+map("v", "<leader>h", "<cmd>lua require'hop'.hint_words()<cr>")
+map("v", "<leader>l", "<cmd>lua require'hop'.hint_lines()<cr>")
+ ]]
 -- Session
 local sessionopts = {
   log_level = "info",
@@ -125,7 +153,7 @@ local sessionopts = {
   auto_session_enabled = true,
   auto_save_enabled = true,
   auto_restore_enabled = true,
-  auto_session_suppress_dirs = nil
+  auto_session_suppress_dirs = nil,
 }
 
 require("auto-session").setup(sessionopts)
@@ -137,78 +165,80 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
   properties = {
     "documentation",
     "detail",
-    "additionalTextEdits"
-  }
+    "additionalTextEdits",
+  },
 }
 
--- LSP Server config
-require "lspconfig".cssls.setup(
-  {
-    cmd = {"vscode-css-language-server", "--stdio"},
-    capabilities = capabilities,
-    settings = {
-      scss = {
-        lint = {
-          idSelector = "warning",
-          zeroUnits = "warning",
-          duplicateProperties = "warning"
-        },
-        completion = {
-          completePropertyWithSemicolon = true,
-          triggerPropertyValueCompletion = true
-        }
-      }
-    }
-  }
-)
-require "lspconfig".tsserver.setup {}
+-- different path for CSS lang server on office machine
+local envMachine = os.getenv("MACHINE")
+if envMachine == "work" then
+  machineCmd =
+    "/System/Volumes/Data/usr/local/lib/node_modules/vscode-langservers-extracted/bin/vscode-css-language-server"
+else
+  machineCmd = "vscode-css-language-server"
+end
 
--- LSP Prevents inline buffer annotations
-vim.lsp.diagnostic.show_line_diagnostics()
-vim.lsp.handlers["textDocument/publishDiagnostics"] =
-  vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics,
-  {
-    virtual_text = false
-  }
-)
+-- LSP Server config
+require("lspconfig").cssls.setup({
+  cmd = { machineCmd, "--stdio" },
+  capabilities = capabilities,
+  settings = {
+    scss = {
+      lint = {
+        idSelector = "warning",
+        zeroUnits = "warning",
+        duplicateProperties = "warning",
+      },
+      completion = {
+        completePropertyWithSemicolon = true,
+        triggerPropertyValueCompletion = true,
+      },
+    },
+  },
+})
+require("lspconfig").tsserver.setup({})
 require'lspconfig'.html.setup{}
 require'lspconfig'.cssls.setup{}
 require'lspconfig'.svelte.setup{}
 require'lspconfig'.tailwindcss.setup{}
 require'lspconfig'.sumneko_lua.setup{}
+
+-- LSP Prevents inline buffer annotations
+vim.lsp.diagnostic.show_line_diagnostics()
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+  virtual_text = false,
+})
+
 -- LSP Saga config & keys https://github.com/glepnir/lspsaga.nvim
-local saga = require "lspsaga"
+local saga = require("lspsaga")
+saga.init_lsp_saga({
+  code_action_icon = " ",
+  definition_preview_icon = "  ",
+  dianostic_header_icon = "   ",
+  error_sign = " ",
+  finder_definition_icon = "  ",
+  finder_reference_icon = "  ",
+  hint_sign = "⚡",
+  infor_sign = "",
+  warn_sign = "",
+})
 
-saga.init_lsp_saga()
--- saga.init_lsp_saga {
---   code_action_icon = " ",
---   definition_preview_icon = "  ",
---   dianostic_header_icon = "   ",
---   error_sign = " ",
---   finder_definition_icon = "  ",
---   finder_reference_icon = "  ",
---   hint_sign = "⚡",
---   infor_sign = "",
---   warn_sign = ""
--- }
-
-map("n", "<Leader>cf", ":Lspsaga lsp_finder<CR>", {silent = true})
-map("n", "<leader>ca", ":Lspsaga code_action<CR>", {silent = true})
-map("v", "<leader>ca", ":<C-U>Lspsaga range_code_action<CR>", {silent = true})
-map("n", "<leader>ch", ":Lspsaga hover_doc<CR>", {silent = true})
-map("n", "<leader>ck", '<cmd>lua require("lspsaga.action").smart_scroll_with_saga(-1)<CR>', {silent = true})
-map("n", "<leader>cj", '<cmd>lua require("lspsaga.action").smart_scroll_with_saga(1)<CR>', {silent = true})
-map("n", "<leader>cs", ":Lspsaga signature_help<CR>", {silent = true})
-map("n", "<leader>ci", ":Lspsaga show_line_diagnostics<CR>", {silent = true})
-map("n", "<leader>cn", ":Lspsaga diagnostic_jump_next<CR>", {silent = true})
-map("n", "<leader>cp", ":Lspsaga diagnostic_jump_prev<CR>", {silent = true})
-map("n", "<leader>cr", ":Lspsaga rename<CR>", {silent = true})
-map("n", "<leader>cd", ":Lspsaga preview_definition<CR>", {silent = true})
+map("n", "<Leader>cf", ":Lspsaga lsp_finder<CR>", { silent = true })
+map("n", "<leader>ca", ":Lspsaga code_action<CR>", { silent = true })
+map("v", "<leader>ca", ":<C-U>Lspsaga range_code_action<CR>", { silent = true })
+map("n", "<leader>ch", ":Lspsaga hover_doc<CR>", { silent = true })
+map("n", "<leader>ck", '<cmd>lua require("lspsaga.action").smart_scroll_with_saga(-1)<CR>', { silent = true })
+map("n", "<leader>cj", '<cmd>lua require("lspsaga.action").smart_scroll_with_saga(1)<CR>', { silent = true })
+map("n", "<leader>cs", ":Lspsaga signature_help<CR>", { silent = true })
+map("n", "<leader>ci", ":Lspsaga show_line_diagnostics<CR>", { silent = true })
+map("n", "<leader>cn", ":Lspsaga diagnostic_jump_next<CR>", { silent = true })
+map("n", "<leader>cp", ":Lspsaga diagnostic_jump_prev<CR>", { silent = true })
+map("n", "<leader>cr", ":Lspsaga rename<CR>", { silent = true })
+map("n", "<leader>cd", ":Lspsaga preview_definition<CR>", { silent = true })
 
 -- Setup treesitter
-local ts = require "nvim-treesitter.configs"
-ts.setup {ensure_installed = "maintained", highlight = {enable = true}}
+local ts = require("nvim-treesitter.configs")
+ts.setup({ ensure_installed = "maintained", highlight = { enable = true } })
 
 -- Colourscheme config
 vim.g.everforest_background = "hard"
@@ -218,10 +248,10 @@ vim.g.everforest_diagnostic_virtual_text = "colored"
 vim.g.everforest_current_word = "bold"
 
 -- Load the colorscheme
-cmd [[colorscheme everforest]] -- Put your favorite colorscheme here
+cmd([[colorscheme everforest]]) -- Put your favorite colorscheme here
 
 opt.mouse = "a"
-opt.backspace = {"indent", "eol", "start"}
+opt.backspace = { "indent", "eol", "start" }
 opt.clipboard = "unnamedplus"
 opt.completeopt = "menuone,noselect"
 opt.cursorline = true
@@ -246,7 +276,7 @@ opt.shiftround = true -- Round indent
 opt.shiftwidth = 4 -- Size of an indent
 opt.showmode = false -- Don't display mode
 opt.sidescrolloff = 8 -- Columns of context
-opt.signcolumn = "yes" -- always show signcolumns
+opt.signcolumn = "yes:1" -- always show signcolumns
 opt.smartcase = true -- Do not ignore case with capitals
 opt.smartindent = true -- Insert indents automatically
 opt.spelllang = "en"
@@ -256,6 +286,8 @@ opt.tabstop = 4 -- Number of spaces tabs count for
 opt.termguicolors = true -- You will have bad experience for diagnostic messages when it's default 4000.
 opt.updatetime = 250 -- don't give |ins-completion-menu| messages.
 opt.wrap = true
+
+vim.g.netrw_liststyle = 3 -- Tree style Netrw
 
 -- Use spelling for markdown files ‘]s’ to find next, ‘[s’ for previous, 'z=‘ for suggestions when on one.
 -- Source: http:--thejakeharding.com/tutorial/2012/06/13/using-spell-check-in-vim.html
@@ -274,50 +306,55 @@ augroup END
 g.minimap_width = 10
 g.minimap_auto_start = 0
 g.minimap_auto_start_win_enter = 0
-
 -- location icon: 
-require "lualine".setup {
+require("lualine").setup({
   options = {
     icons_enabled = true,
     theme = "everforest",
-    component_separators = {"∙", "∙"},
-    section_separators = {"", ""},
-    disabled_filetypes = {}
+    component_separators = { " ", " " },
+    section_separators = { "", "" },
+    disabled_filetypes = {},
   },
   sections = {
-    lualine_a = {"mode", "paste"},
-    lualine_b = {"branch", "diff"},
-    lualine_c = {
-      {"filename", file_status = true, full_path = true},
-      require "lsp-status".status
+    lualine_a = { "mode", "paste" },
+    lualine_b = {
+      { "branch", icon = "" },
+      { "diff", color_added = "#a7c080", color_modified = "#ffdf1b", color_removed = "#ff6666" },
     },
-    lualine_x = {"filetype"},
+    lualine_c = {
+      { "diagnostics", sources = { "nvim_lsp" } },
+      function()
+        return "%="
+      end,
+      "filename",
+    },
+    lualine_x = { "filetype" },
     lualine_y = {
       {
-        "progress"
-      }
+        "progress",
+      },
     },
     lualine_z = {
       {
         "location",
-        icon = ""
-      }
-    }
+        icon = "",
+      },
+    },
   },
   inactive_sections = {
     lualine_a = {},
     lualine_b = {},
-    lualine_c = {"filename"},
-    lualine_x = {"location"},
+    lualine_c = { "filename" },
+    lualine_x = { "location" },
     lualine_y = {},
-    lualine_z = {}
+    lualine_z = {},
   },
   tabline = {},
-  extensions = {}
-}
+  extensions = {},
+})
 
 -- Compe setup start
-require "compe".setup {
+require("compe").setup({
   enabled = true,
   autocomplete = true,
   debug = false,
@@ -331,36 +368,23 @@ require "compe".setup {
   max_kind_width = 100,
   max_menu_width = 100,
   documentation = {
-    border = {"", "", "", " ", "", "", "", " "}, -- the border option is the same as `|help nvim_open_win|`
+    border = { "", "", "", " ", "", "", "", " " }, -- the border option is the same as `|help nvim_open_win|`
     winhighlight = "NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder",
     max_width = 120,
     min_width = 60,
     max_height = math.floor(vim.o.lines * 0.3),
-    min_height = 1
+    min_height = 1,
   },
   source = {
-    -- path = true,
-    -- buffer = true,
-    -- calc = true,
-    -- nvim_lsp = true,
-    -- nvim_lua = true,
-    -- vsnip = true,
-    -- luasnip = true
-    path = { kind = "   (Path)" },
-    buffer = { kind = "   (Buffer)" },
-    calc = { kind = "   (Calc)" },
-    vsnip = { kind = "   (Snippet)" },
-    nvim_lsp = { kind = "   (LSP)" },
-    nvim_lua = false,
-    spell = { kind = "   (Spell)" },
-    tags = false,
-    vim_dadbod_completion = false,
-    snippets_nvim = false,
-    ultisnips = false,
-    treesitter = false,
-    emoji = { kind = " ﲃ  (Emoji)", filetypes = { "markdown", "text" } },
-  }
-}
+    path = true,
+    buffer = true,
+    calc = true,
+    nvim_lsp = true,
+    nvim_lua = true,
+    vsnip = true,
+    luasnip = true,
+  },
+})
 
 local t = function(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -380,40 +404,40 @@ end
 --- jump to prev/next snippet's placeholder
 _G.tab_complete = function()
   if vim.fn.pumvisible() == 1 then
-    return t "<C-n>"
+    return t("<C-n>")
   elseif check_back_space() then
-    return t "<Tab>"
+    return t("<Tab>")
   else
     return vim.fn["compe#complete"]()
   end
 end
 _G.s_tab_complete = function()
   if vim.fn.pumvisible() == 1 then
-    return t "<C-p>"
+    return t("<C-p>")
   else
-    return t "<S-Tab>"
+    return t("<S-Tab>")
   end
 end
 
-vim.api.nvim_set_keymap("i", "<CR>", "compe#confirm({ 'keys': '<CR>', 'select': v:true })", {expr = true})
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("i", "<CR>", "compe#confirm({ 'keys': '<CR>', 'select': v:true })", { expr = true })
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
 
 -- End Compe related setup
 
 -- Open nvimrc file
--- map("n", "<Leader>v", "<cmd>e $MYVIMRC<CR>")
+map("n", "<Leader>v", "<cmd>e $MYVIMRC<CR>")
 
 -- Source nvimrc file
--- map("n", "<Leader>sv", ":luafile %<CR>")
+map("n", "<Leader>sv", ":luafile %<CR>")
 
 -- Quick new file
 map("n", "<Leader>n", "<cmd>enew<CR>")
 
 -- Easy select all of file
-map("n", "<Leader>a", "ggVG<c-$>")
+map("n", "<Leader>sa", "ggVG<c-$>")
 
 -- Make visual yanks place the cursor back where started
 map("v", "y", "ygv<Esc>")
@@ -431,120 +455,144 @@ map("n", "<C-j>", "<C-w>j", { silent = true } )
 map("n", "<C-k>", "<C-w>k", { silent = true } )
 map("n", "<C-l>", "<C-w>l", { silent = true } )
 
+-- More molecular undo of text
+map("i", ",", ",<c-g>u")
+map("i", ".", ".<c-g>u")
+map("i", "!", "!<c-g>u")
+map("i", "?", "?<c-g>u")
+map("i", ";", ";<c-g>u")
+map("i", ":", ":<c-g>u")
+
+-- Keep search results centred
+map("n", "n", "nzzzv")
+map("n", "N", "Nzzzv")
+map("n", "J", "mzJ`z")
+
+-- Make Y yank to end of the line
+map("n", "Y", "y$")
+
+-- Line bubbling
+-- Use these two if you don't have prettier
+--map('n'), '<c-j>', '<cmd>m .+1<CR>==')
+--map('n,) <c-k>', '<cmd>m .-2<CR>==')
+map("n", "<c-j>", "<cmd>m .+1<CR>", { silent = true })
+map("n", "<c-k>", "<cmd>m .-2<CR>", { silent = true })
+map("i", "<c-j> <Esc>", "<cmd>m .+1<CR>==gi", { silent = true })
+map("i", "<c-k> <Esc>", "<cmd>m .-2<CR>==gi", { silent = true })
+map("v", "<c-j>", "<cmd>m +1<CR>gv=gv", { silent = true })
+map("v", "<c-k>", "<cmd>m -2<CR>gv=gv", { silent = true })
+
+-- Simpler increment/decrement integers
+map("n", "+", "<C-a>", { silent = true })
+map("v", "+", "<C-a>", { silent = true })
+map("n", "-", "<C-x>", { silent = true })
+map("v", "-", "<C-x>", { silent = true })
 
 --Auto close tags
 map("i", ",/", "</<C-X><C-O>")
 
 --After searching, pressing escape stops the highlight
-map("n", "<esc>", ":noh<cr><esc>", {silent = true})
+map("n", "<esc>", ":noh<cr><esc>", { silent = true })
 
 -- Telescope Global remapping
 local actions = require("telescope.actions")
-require("telescope").setup {
+require("telescope").setup({
   defaults = {
+    winblend = 20,
     sorting_strategy = "descending",
     layout_strategy = "horizontal",
-      layout_config = {
-        width = 0.75,
-        prompt_position = "bottom",
-        preview_cutoff = 120,
-        horizontal = { mirror = false },
-        vertical = { mirror = false },
-      },
     mappings = {
       i = {
-        ["<esc>"] = actions.close
-      }
-    }
+        ["<esc>"] = actions.close,
+      },
+    },
   },
   pickers = {
     buffers = {
       sort_lastused = true,
       mappings = {
         i = {
-          ["<C-w>"] = "delete_buffer"
+          ["<C-w>"] = "delete_buffer",
         },
         n = {
-          ["<C-w>"] = "delete_buffer"
-        }
-      }
-    }
-  }
-}
+          ["<C-w>"] = "delete_buffer",
+        },
+      },
+    },
+  },
+})
 
 map(
   "n",
-  "<leader>sp",
+  "<leader>p",
   '<cmd>lua require("telescope.builtin").find_files(require("telescope.themes").get_dropdown({}))<cr>'
 )
-map("n", "<leader>sr", '<cmd>lua require("telescope.builtin").registers()<cr>')
-map( 
+map("n", "<leader>r", '<cmd>lua require("telescope.builtin").registers()<cr>')
+map(
   "n",
-  "<leader>st",
+  "<leader>g",
   '<cmd>lua require("telescope.builtin").live_grep(require("telescope.themes").get_dropdown({}))<cr>'
 )
-map("n", "<leader>sb", '<cmd>lua require("telescope.builtin").buffers(require("telescope.themes").get_dropdown({}))<cr>')
-map("n", "<leader>sh", '<cmd>lua require("telescope.builtin").help_tags()<cr>')
+map("n", "<leader>b", '<cmd>lua require("telescope.builtin").buffers(require("telescope.themes").get_dropdown({}))<cr>')
+map("n", "<leader>j", '<cmd>lua require("telescope.builtin").help_tags()<cr>')
 map(
   "n",
-  "<leader>sf",
+  "<leader>f",
   '<cmd>lua require("telescope.builtin").file_browser(require("telescope.themes").get_dropdown({}))<cr>'
 )
-map("n", "<leader>ss", '<cmd>lua require("telescope.builtin").spell_suggest()<cr>')
+map("n", "<leader>s", '<cmd>lua require("telescope.builtin").spell_suggest()<cr>')
 map(
   "n",
-  "<leader>si",
+  "<leader>i",
   '<cmd>lua require("telescope.builtin").git_status(require("telescope.themes").get_dropdown({}))<cr>'
 )
 
 -------------------- COMMANDS ------------------------------
-cmd "au TextYankPost * lua vim.highlight.on_yank {on_visual = true}" -- disabled in visual mode
+cmd("au TextYankPost * lua vim.highlight.on_yank {on_visual = true}") -- disabled in visual mode
 
 -- Prettier function for formatter
 local prettier = function()
   return {
     exe = "prettier",
-    args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0), "--single-quote","--no-semi"},
-    stdin = true
+    args = { "--stdin-filepath", vim.api.nvim_buf_get_name(0), "--double-quote" },
+    stdin = true,
   }
 end
 
-
-
-require("formatter").setup(
-  {
-    logging = false,
-    filetype = {
-      javascript = {prettier},
-      typescript = {prettier},
-      html = {prettier},
-      css = {prettier},
-      scss = {prettier},
-      markdown = {prettier},
-      svelte = {prettier},
-      -- lua = {
-        -- function()
-          -- return {
-            -- exe = "luafmt",
-            -- args = {"--indent-count", 2, "--stdin"},
-            -- stdin = true
-          -- }
-        -- end
-      -- }
-    }
-  }
-)
+require("formatter").setup({
+  logging = false,
+  filetype = {
+    javascript = { prettier },
+    typescript = { prettier },
+    html = { prettier },
+    css = { prettier },
+    scss = { prettier },
+    markdown = { prettier },
+    svelte = { prettier },
+    lua = {
+      -- Stylua
+      function()
+        return {
+          exe = "stylua",
+          args = { "--indent-width", 2, "--indent-type", "Spaces" },
+          stdin = false,
+        }
+      end,
+    },
+  },
+})
 
 -- Runs Formatter on save
 vim.api.nvim_exec(
   [[
 augroup FormatAutogroup
   autocmd!
-  autocmd BufWritePost *.js,*.svelte,*.ts,*.css,*.scss,*.md,*.html : FormatWrite
+  autocmd BufWritePost *.js,*.ts,*.css,*.scss,*.md,*.html,*.lua,*.svelte : FormatWrite
 augroup END
 ]],
   true
 )
+
 -- Nvim tree
 vim.o.termguicolors = true
 
