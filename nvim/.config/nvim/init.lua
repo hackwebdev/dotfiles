@@ -76,75 +76,126 @@ require("gitsigns").setup({
   signcolumn = false,
 })
 
+
+
 local wk = require("which-key")
 
 wk.register({
-  ["<leader>"] = {
-    ["/"] = "Comment", 
-    ["e"] = "NvimTreeToggle",
-    ["m"] = "Minimap",
-    ["n"] = "New File",
-    ["a"] = "Select All",
-    ["w"] = "Save",
-    c ={
-        name = "LSP",
-        ["f"] = "find",
-        ["a"] = "action",
-        ["h"] = "hover",
-        ["j"] = "scroll up",
-        ["k"] = "scroll down",
-        ["s"] = "help",
-        ["i"] = "diagnostic",
-        ["n"] = "jump next",
-        ["p"] = "jump previous",
-        ["r"] = "rename",
-        ["d"] = "preview",
-    },
-    -- h = {
-    --     name = "hop",
-    --     ["l"] = "words",
-    --     ["j"] = "lines"
-    -- },
-    s = {
-        name = "search",
-        ["b"] = "buffers",
-        ["t"] = "text",
-        ["i"] = "git status",
-        ["r"] = "registers",
-        ["s"] = "spell suggestion",
-        ["p"] = "files",
-        ["f"] = "browser",
-        ["h"] = "help",
-    },
+  ["/"] = {"<Plug>kommentary_line_default","Comment"},
+  ["e"] = {"<cmd>NvimTreeToggle<CR>","NvimTreeToggle"},
+  ["r"] = {"<cmd>NvimTreeRefresh<CR>","NvimTreeRefresh"},
+  ["m"] = {"<cmd>MinimapToggle<CR>","MinimapToggle"},
+  ["n"] = {"<cmd>enew<CR>","New File"},
+  ["w"] = {"<cmd>:w<CR>","Save"},
+  f = {
+    name = "LSP", 
+    f = { "<cmd>:Lspsaga lsp_finder<CR><cr>", "Find" },
+    a = { "<cmd>:Lspsaga code_action<CR><cr>", "Action" },
+    h = { "<cmd>:Lspsaga hover_doc<CR><cr>", "Hover" },
+    j = { "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>", "Scroll up" },
+    k = { "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>", "Scroll down" },
+    s = { "<cmd>:Lspsaga signature_help<CR><cr>", "Help" },
+    i = { "<cmd>:Lspsaga show_line_diagnostics<CR><cr>", "Diagnostic" },
+    n = { "<cmd>:Lspsaga diagnostic_jump_next<CR><cr>", "Jump next" },
+    p = { "<cmd>:Lspsaga diagnostic_jump_prev<CR><cr>", "Jump previous" },
+    r = { "<cmd>:Lspsaga rename<CR><cr>", "Rename" },
+    d = { "<cmd>:Lspsaga preview_definition<CR><cr>", "Preview" },
   },
-})
+  s = {
+    name = "Search", 
+    b = { "<cmd>Telescope find_files<cr>", "Find Files" },
+    t = { "<cmd>Telescope live_grep<cr>", "Find Text" },
+    i = { "<cmd>Telescope git_status<cr>", "Git Status" },
+    r = { "<cmd>Telescope registers<cr>", "Registers" },
+    s = { "<cmd>Telescope spell_suggest<cr>", "Spell Suggestions" },
+    s = { "<cmd>Telescope file_browser<cr>", "Browser" },
+    s = { "<cmd>Telescope help_tags<cr>", "Help" },
+   }
+}, { prefix = "<leader>" })
+
 
 -- My keymappings
-map("n","<leader>e","<cmd>NvimTreeToggle<CR>") 
-map("n","<C-r>","<cmd>NvimTreeRefresh<CR>")
-  -- CommentToggle
--- map("n","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
--- map("v","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
-map("n","<leader>/","<Plug>kommentary_line_default",{})
--- map("n","<leader>/","<cmd>CommentToggle<CR>",{ noremap = true, silent = true })
   -- better indenting
 map("v","<","<gv")
 map("v",">",">gv")
   -- move selected lines
 map("x","K",":move '<-2<CR>gv-gv")
 map("x","J",":move '>+1<CR>gv-gv")
-  -- minimap
-map("n","<leader>m","<cmd>MinimapToggle<CR>")
 
--- Hop
---[[ require("hop").setup({
-	reverse_distribution = true,
-})
-map("n", "<leader>h", "<cmd>lua require'hop'.hint_words()<cr>")
-map("n", "<leader>l", "<cmd>lua require'hop'.hint_lines()<cr>")
-map("v", "<leader>h", "<cmd>lua require'hop'.hint_words()<cr>")
-map("v", "<leader>l", "<cmd>lua require'hop'.hint_lines()<cr>")
- ]]
+-- Compe
+vim.api.nvim_set_keymap("i", "<CR>", "compe#confirm({ 'keys': '<CR>', 'select': v:true })", { expr = true })
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
+
+-- Open nvimrc file
+-- map("n", "<Leader>v", "<cmd>e $MYVIMRC<CR>")
+
+-- Source nvimrc file
+-- map("n", "<Leader>sv", ":luafile %<CR>")
+
+-- Quick new file
+-- map("n", "<Leader>n", "<cmd>enew<CR>")
+
+-- Easy select all of file
+-- map("n", "<Leader>sa", "ggVG<c-$>")
+
+-- Make visual yanks place the cursor back where started
+map("v", "y", "ygv<Esc>")
+
+-- Easier file save
+-- map("n", "<Leader>w", "<cmd>:w<CR>")
+
+-- Tab to switch buffers in Normal mode
+map("n", "<Tab>", ":bnext<CR>")
+map("n", "<S-Tab>", ":bprevious<CR>")
+
+-- Better window movement
+map("n", "<C-h>", "<C-w>h", { silent = true } )
+map("n", "<C-j>", "<C-w>j", { silent = true } )
+map("n", "<C-k>", "<C-w>k", { silent = true } )
+map("n", "<C-l>", "<C-w>l", { silent = true } )
+
+-- More molecular undo of text
+-- map("i", ",", ",<c-g>u")
+-- map("i", ".", ".<c-g>u")
+-- map("i", "!", "!<c-g>u")
+-- map("i", "?", "?<c-g>u")
+-- map("i", ";", ";<c-g>u")
+-- map("i", ":", ":<c-g>u")
+
+-- Keep search results centred
+map("n", "n", "nzzzv")
+map("n", "N", "Nzzzv")
+map("n", "J", "mzJ`z")
+
+-- Make Y yank to end of the line
+map("n", "Y", "y$")
+
+-- Line bubbling
+-- Use these two if you don't have prettier
+--map('n'), '<c-j>', '<cmd>m .+1<CR>==')
+--map('n,) <c-k>', '<cmd>m .-2<CR>==')
+-- map("n", "<c-j>", "<cmd>m .+1<CR>", { silent = true })
+-- map("n", "<c-k>", "<cmd>m .-2<CR>", { silent = true })
+-- map("i", "<c-j> <Esc>", "<cmd>m .+1<CR>==gi", { silent = true })
+-- map("i", "<c-k> <Esc>", "<cmd>m .-2<CR>==gi", { silent = true })
+-- map("v", "<c-j>", "<cmd>m +1<CR>gv=gv", { silent = true })
+-- map("v", "<c-k>", "<cmd>m -2<CR>gv=gv", { silent = true })
+
+-- Simpler increment/decrement integers
+map("n", "+", "<C-a>", { silent = true })
+map("v", "+", "<C-a>", { silent = true })
+map("n", "-", "<C-x>", { silent = true })
+map("v", "-", "<C-x>", { silent = true })
+
+--Auto close tags
+map("i", ",/", "</<C-X><C-O>")
+
+--After searching, pressing escape stops the highlight
+-- map("n", "<esc>", ":noh<cr><esc>", { silent = true })
+
 -- Session
 local sessionopts = {
   log_level = "info",
@@ -223,18 +274,7 @@ saga.init_lsp_saga({
   warn_sign = "",
 })
 
-map("n", "<Leader>cf", ":Lspsaga lsp_finder<CR>", { silent = true })
-map("n", "<leader>ca", ":Lspsaga code_action<CR>", { silent = true })
-map("v", "<leader>ca", ":<C-U>Lspsaga range_code_action<CR>", { silent = true })
-map("n", "<leader>ch", ":Lspsaga hover_doc<CR>", { silent = true })
-map("n", "<leader>ck", '<cmd>lua require("lspsaga.action").smart_scroll_with_saga(-1)<CR>', { silent = true })
-map("n", "<leader>cj", '<cmd>lua require("lspsaga.action").smart_scroll_with_saga(1)<CR>', { silent = true })
-map("n", "<leader>cs", ":Lspsaga signature_help<CR>", { silent = true })
-map("n", "<leader>ci", ":Lspsaga show_line_diagnostics<CR>", { silent = true })
-map("n", "<leader>cn", ":Lspsaga diagnostic_jump_next<CR>", { silent = true })
-map("n", "<leader>cp", ":Lspsaga diagnostic_jump_prev<CR>", { silent = true })
-map("n", "<leader>cr", ":Lspsaga rename<CR>", { silent = true })
-map("n", "<leader>cd", ":Lspsaga preview_definition<CR>", { silent = true })
+
 
 -- Setup treesitter
 local ts = require("nvim-treesitter.configs")
@@ -419,80 +459,9 @@ _G.s_tab_complete = function()
   end
 end
 
-vim.api.nvim_set_keymap("i", "<CR>", "compe#confirm({ 'keys': '<CR>', 'select': v:true })", { expr = true })
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", { expr = true })
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", { expr = true })
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
-
 -- End Compe related setup
 
--- Open nvimrc file
-map("n", "<Leader>v", "<cmd>e $MYVIMRC<CR>")
 
--- Source nvimrc file
-map("n", "<Leader>sv", ":luafile %<CR>")
-
--- Quick new file
-map("n", "<Leader>n", "<cmd>enew<CR>")
-
--- Easy select all of file
-map("n", "<Leader>sa", "ggVG<c-$>")
-
--- Make visual yanks place the cursor back where started
-map("v", "y", "ygv<Esc>")
-
--- Easier file save
-map("n", "<Leader>w", "<cmd>:w<CR>")
-
--- Tab to switch buffers in Normal mode
-map("n", "<Tab>", ":bnext<CR>")
-map("n", "<S-Tab>", ":bprevious<CR>")
-
--- Better window movement
-map("n", "<C-h>", "<C-w>h", { silent = true } )
-map("n", "<C-j>", "<C-w>j", { silent = true } )
-map("n", "<C-k>", "<C-w>k", { silent = true } )
-map("n", "<C-l>", "<C-w>l", { silent = true } )
-
--- More molecular undo of text
-map("i", ",", ",<c-g>u")
-map("i", ".", ".<c-g>u")
-map("i", "!", "!<c-g>u")
-map("i", "?", "?<c-g>u")
-map("i", ";", ";<c-g>u")
-map("i", ":", ":<c-g>u")
-
--- Keep search results centred
-map("n", "n", "nzzzv")
-map("n", "N", "Nzzzv")
-map("n", "J", "mzJ`z")
-
--- Make Y yank to end of the line
-map("n", "Y", "y$")
-
--- Line bubbling
--- Use these two if you don't have prettier
---map('n'), '<c-j>', '<cmd>m .+1<CR>==')
---map('n,) <c-k>', '<cmd>m .-2<CR>==')
-map("n", "<c-j>", "<cmd>m .+1<CR>", { silent = true })
-map("n", "<c-k>", "<cmd>m .-2<CR>", { silent = true })
-map("i", "<c-j> <Esc>", "<cmd>m .+1<CR>==gi", { silent = true })
-map("i", "<c-k> <Esc>", "<cmd>m .-2<CR>==gi", { silent = true })
-map("v", "<c-j>", "<cmd>m +1<CR>gv=gv", { silent = true })
-map("v", "<c-k>", "<cmd>m -2<CR>gv=gv", { silent = true })
-
--- Simpler increment/decrement integers
-map("n", "+", "<C-a>", { silent = true })
-map("v", "+", "<C-a>", { silent = true })
-map("n", "-", "<C-x>", { silent = true })
-map("v", "-", "<C-x>", { silent = true })
-
---Auto close tags
-map("i", ",/", "</<C-X><C-O>")
-
---After searching, pressing escape stops the highlight
-map("n", "<esc>", ":noh<cr><esc>", { silent = true })
 
 -- Telescope Global remapping
 local actions = require("telescope.actions")
@@ -521,31 +490,6 @@ require("telescope").setup({
     },
   },
 })
-
-map(
-  "n",
-  "<leader>p",
-  '<cmd>lua require("telescope.builtin").find_files(require("telescope.themes").get_dropdown({}))<cr>'
-)
-map("n", "<leader>r", '<cmd>lua require("telescope.builtin").registers()<cr>')
-map(
-  "n",
-  "<leader>g",
-  '<cmd>lua require("telescope.builtin").live_grep(require("telescope.themes").get_dropdown({}))<cr>'
-)
-map("n", "<leader>b", '<cmd>lua require("telescope.builtin").buffers(require("telescope.themes").get_dropdown({}))<cr>')
-map("n", "<leader>j", '<cmd>lua require("telescope.builtin").help_tags()<cr>')
-map(
-  "n",
-  "<leader>f",
-  '<cmd>lua require("telescope.builtin").file_browser(require("telescope.themes").get_dropdown({}))<cr>'
-)
-map("n", "<leader>s", '<cmd>lua require("telescope.builtin").spell_suggest()<cr>')
-map(
-  "n",
-  "<leader>i",
-  '<cmd>lua require("telescope.builtin").git_status(require("telescope.themes").get_dropdown({}))<cr>'
-)
 
 -------------------- COMMANDS ------------------------------
 cmd("au TextYankPost * lua vim.highlight.on_yank {on_visual = true}") -- disabled in visual mode
