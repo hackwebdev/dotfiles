@@ -12,7 +12,8 @@ light-locker &
 /usr/bin/dunst &
 picom &
 redshift-gtk &
-bash ~/.config/polybar/launch.sh --forest &
+bash ~/.config/polybar/launch.sh &
+# bash ~/.config/polybar/launch.sh --forest &
 
 
 # Workspaces
