@@ -1,3 +1,5 @@
+export PATH=$PATH:~/.local/bin/lvim
+
 alias compass="mongodb-compass"
 alias mongodb="mongod --auth --port 27017 -dbpath /home/eckzen/database"
 

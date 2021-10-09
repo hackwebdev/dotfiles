@@ -17,9 +17,13 @@ super + d
 super + p
 	nemo
 
-# Telegram-desktop
+# Messenger
 super + q
-	telegram-desktop
+	caprine
+
+# Joplin
+super + z
+	jolpin-desktop
 	
 # VS Code
 super + a
