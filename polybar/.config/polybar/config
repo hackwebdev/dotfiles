@@ -20,9 +20,9 @@ module-margin-right = 1
 
 font-0 = FiraCode Nerd Font:size=10;1
 
-modules-left = bspwm xwindow
-modules-center = date 
-modules-right =   memory wireless-network pulseaudio battery
+modules-left = bspwm  xwindow
+modules-center = date memory
+modules-right =  wireless-network pulseaudio battery
 
 wm-restack = bspwm
 
@@ -94,12 +94,15 @@ type = internal/network
 interface = wlp2s0
 
 interval = 3.0
+udspeed-minwidth = 3
+accumulate-stats = true
+unknown-as-up = true
 
 format-connected = %{A1:networkmanager_dmenu:}直 <label-connected>%{A}
-label-connected = %essid%
+label-connected = %essid% %upspeed%%downspeed:9%
 
 format-disconnected = %{A1:networkmanager_dmenu:}睊%{A}
-
+animation-packetloss-framerate = 500
 
 [module/date]
 type = internal/date
@@ -162,6 +165,8 @@ interval = 3
 
 
 label =  %mb_used%
+
+
 
 
 
